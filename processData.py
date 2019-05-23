@@ -80,24 +80,33 @@ def visualize_data():
     print(df_corr.head())
     df_corr.to_csv('sp500corr.csv')
     data1 = df_corr.values
-    fig1 = plt.figure()
-    ax1 = fig1.add_subplot(111)
+    #fig1 = plt.figure()
+    #ax1 = fig1.add_subplot(111)
 
-    heatmap1 = ax1.pcolor(data1, cmap=plt.cm.RdYlGn)
-    fig1.colorbar(heatmap1)
+    #heatmap1 = ax1.pcolor(data1, cmap=plt.cm.RdYlGn)
+    #fig1.colorbar(heatmap1)
 
-    ax1.set_xticks(np.arange(data1.shape[1]) + 0.5, minor=False)
-    ax1.set_yticks(np.arange(data1.shape[0]) + 0.5, minor=False)
-    ax1.invert_yaxis()
-    ax1.xaxis.tick_top()
-    column_labels = df_corr.columns
-    row_labels = df_corr.index
-    ax1.set_xticklabels(column_labels)
-    ax1.set_yticklabels(row_labels)
-    plt.xticks(rotation=90)
-    heatmap1.set_clim(-1, 1)
-    plt.tight_layout()
-    plt.show()
+    #ax1.set_xticks(np.arange(data1.shape[1]) + 0.5, minor=False)
+    #ax1.set_yticks(np.arange(data1.shape[0]) + 0.5, minor=False)
+    #ax1.invert_yaxis()
+    #ax1.xaxis.tick_top()
+    #column_labels = df_corr.columns
+    #row_labels = df_corr.index
+    #ax1.set_xticklabels(column_labels)
+    #ax1.set_yticklabels(row_labels)
+    #plt.xticks(rotation=90)
+    #heatmap1.set_clim(-1, 1)
+    #plt.tight_layout()
+    #plt.show()
 
+def process_data_for_labels(ticker):
+    hm_days = 7
+    df = pd.read_csv('sp500_joined_closes.csv', index_col=0)
+    tickers = df.columns.values.tolist()
+    df.fillna(0, inplace=True)
 
-visualize_data()
+    for i in range(1,hm_days+1):
+        df['{}_{}d'.format(ticker,i)] = (df[ticker].shift(-i) - df[ticker]) / df[ticker]
+
+    df.fillna(0, inplace=True)
+    return tickers, df
