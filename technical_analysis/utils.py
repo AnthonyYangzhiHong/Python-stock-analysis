@@ -38,6 +38,10 @@ def findTAPattern(df, patternName):
         df[patternName] = talib.CDLDOJI(df.Open.values, df.High.values, df.Low.values, df.Close.values)
     elif patternName == 'ENGULFING':
         df[patternName] = talib.CDLENGULFING(df.Open.values, df.High.values, df.Low.values, df.Close.values)
+    elif patternName == 'EVENINGSTAR':
+        df[patternName] = talib.CDLEVENINGSTAR(df.Open.values, df.High.values, df.Low.values, df.Close.values)
+    elif patternName == 'MARUBOZU':
+        df[patternName] = talib.CDLMARUBOZU(df.Open.values, df.High.values, df.Low.values, df.Close.values)
     else:
         print('Pattern not supported yet')
 
@@ -78,10 +82,15 @@ def drawCandleChartWithTAPattern(ticker, start_date, end_date, pattern):
     trace = go.Candlestick(x=df_noIndex['Date'], open=df_noIndex['Open'], high=df_noIndex['High'], low=df_noIndex['Low'], close=df_noIndex['Close'])
     data = [trace]
     layout = {
+        'xaxis': {
+            'rangeslider': {
+                'visible': False
+            }
+        },
         'shapes': coord
     }
-    fig = go.Figure(data=data, layout=layout)
-    plotly.offline.plot(fig, filename='OHLC/{}-candle-{}-{}-{}.html'.format(ticker, start_date, end_date,pattern))
+    return go.Figure(data=data, layout=layout)
+    #plotly.offline.plot(fig, filename='OHLC/{}-candle-{}-{}-{}.html'.format(ticker, start_date, end_date,pattern))
 
 
 
@@ -99,4 +108,8 @@ def generateOHLC(ticker, start_date, end_date):
     drawOHLCChart(df, ticker, start_date, end_date)
 
 
-drawCandleChartWithTAPattern('AAPL', '2015-01-01', '2015-12-30', 'ENGULFING')
+#drawCandleChartWithTAPattern('AAPL', '2012-01-01', '2015-12-30', 'MARUBOZU')
+
+
+def testImport():
+    print('Function invoked!')
