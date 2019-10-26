@@ -47,7 +47,7 @@ def findTAPattern(df, patternName):
 
     patterned_df = df[df[patternName] != 0]
     return patterned_df
-    #print(patterned_df)
+    print(patterned_df)
 
 
 ##Return array of line positions
@@ -70,26 +70,58 @@ def generateLineCoord(df):
     
     return coordinate_list
 
+#Get minimum and maximum Closing price of given data
+def getMinMaxValue(df):
+    return df['Close'].min(), df['Close'].max()
+
 
 #Draw candle chart with pattern indicator
 def drawCandleChartWithTAPattern(ticker, start_date, end_date, pattern):
     df = getPriceData(ticker , start_date, end_date)
     pattern_df = findTAPattern(df, pattern)
-    coord = generateLineCoord(pattern_df)
+    #coord = generateLineCoord(pattern_df)
+    min_value, max_value = getMinMaxValue(df)
 
     ##Plotly candle stick chart does not take indexed date
     df_noIndex = df.reset_index()
-    trace = go.Candlestick(x=df_noIndex['Date'], open=df_noIndex['Open'], high=df_noIndex['High'], low=df_noIndex['Low'], close=df_noIndex['Close'])
-    data = [trace]
-    layout = {
-        'xaxis': {
-            'rangeslider': {
-                'visible': False
-            }
-        },
-        'shapes': coord
+    pattern_df_noIndex = pattern_df.reset_index()
+    
+    traces = []
+    traces.append(
+        go.Candlestick(
+            x=df_noIndex['Date'], 
+            open=df_noIndex['Open'], 
+            high=df_noIndex['High'], 
+            low=df_noIndex['Low'], 
+            close=df_noIndex['Close']
+        )
+    )
+    traces.append(
+        go.Scatter(
+            x=pattern_df_noIndex['Date'],
+            y=pattern_df_noIndex['Low']-3,
+            mode='markers',
+            marker={
+                'size':10,
+                'color':'blue'
+            },
+            name='signal',
+            opacity=0.5
+        )
+    )
+
+    return {
+        'data': traces,
+        'layout': go.Layout(
+            xaxis={
+                'rangeslider': {
+                    'visible': False
+                }
+            },
+            yaxis_range=[min_value-5, max_value+5],
+            height=800 
+        )
     }
-    return go.Figure(data=data, layout=layout)
     #plotly.offline.plot(fig, filename='OHLC/{}-candle-{}-{}-{}.html'.format(ticker, start_date, end_date,pattern))
 
 
